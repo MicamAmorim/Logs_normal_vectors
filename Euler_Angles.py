@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 def impot_data():
 	z_path = "2_depth.txt"
-	RGB_path = "2_rgb.png"
+	RGB_path = "cubo_depth_02.png"
 	intr_path = "2_intrinsics.txt"
 
 	depth = np.genfromtxt(z_path, delimiter=',') 
@@ -22,6 +22,21 @@ def impot_data():
 
 	Sh = M_rgb/M
 	Sw = N_rgb/N
+
+	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+	#percent by which the image is resized
+	scale_percent = 20
+
+	#calculate the 50 percent of original dimensions
+	width = int(img.shape[1] * scale_percent / 100)
+	height = int(img.shape[0] * scale_percent / 100)
+
+	# dsize
+	dsize = (width, height)
+
+	# resize image
+	img = cv2.resize(img, dsize)
 
 	intrinsics = np.genfromtxt(intr_path, delimiter=',')
 	print(intrinsics)
@@ -69,6 +84,9 @@ def normal_vector(depth, seed):
 	B = P1 - P3
 
 	n = list(np.cross(A,B))
+	i, j, k = n
+	n = n/(np.sqrt(i**2 + j**2 + k**2))
+	
 	print("Normal vector", n)
 
 	constant = -np.dot(n,P1)
@@ -98,7 +116,7 @@ def plot_3d(n, constant, depth):
 	ax.plot_surface(xx, yy, depth ,rstride=1, cstride=1, cmap=plt.cm.viridis,
         linewidth=0)
 	ax.set_zlim(depth.max(), depth.min())
-	ax.view_init(45, 45)
+	ax.view_init(45, 90)
 
 	ax.plot_surface(xx, yy, z, rstride=1, cstride=1, color = "r",
         linewidth=0, alpha = 1)
@@ -116,7 +134,7 @@ def copy8bits(depth):
 
 if __name__ == '__main__':
 
-	depth, img, scale, intrinsics = impot_data()
+	img, depth, scale, intrinsics = impot_data()
 	#print_import(depth, img)
 	seed = []
 	
