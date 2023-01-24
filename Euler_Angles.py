@@ -86,7 +86,7 @@ def normal_vector(depth, seed):
 	n = list(np.cross(A,B))
 	i, j, k = n
 	n = n/(np.sqrt(i**2 + j**2 + k**2))
-	
+
 	print("Normal vector", n)
 
 	constant = -np.dot(n,P1)
@@ -134,6 +134,8 @@ def copy8bits(depth):
 
 if __name__ == '__main__':
 
+
+	# invert the position of img with depth to import the raw data
 	img, depth, scale, intrinsics = impot_data()
 	#print_import(depth, img)
 	seed = []
