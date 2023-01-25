@@ -121,22 +121,21 @@ def set_axes_equal(ax, zoom=1.):
         ax.get_zlim3d(),
     ])
 
-    origin = np.mean(limits, axis=1)
+    origin = np.mean(limits, axis = 1)
     radius = 0.5 * np.max(np.abs(limits[:, 1] - limits[:, 0])) / zoom
     set_axes_radius(ax, origin, radius)
 
-def plot_3d(n, constant, depth):
+def plot_3d(n, constant, depth, arrow_size = 50, step = 20):
 
-	step = 20
 	xx, yy = np.mgrid[0:depth.shape[0], 0:depth.shape[1]]
 
 	# calculate Z for the plane equation
 	z = (-n[0] * xx - n[1] * yy - constant)/n[2]
 
 	fig = plt.figure()
-	ax = fig.gca(projection='3d')
+	ax = fig.gca(projection = '3d')
 
-	ax.set_zlabel("Z", color='b', size=18)
+	ax.set_zlabel("Z", color = 'b', size = 18)
 
 	
 	ax.quiver(
@@ -151,13 +150,13 @@ def plot_3d(n, constant, depth):
 		
 		n[0], n[1], n[2],
 
-		color="m", length=50)
+		color = "m", length = arrow_size)
 	set_axes_equal(ax)
 
-	ax.plot_surface(xx, yy, z, rstride=1, cstride=1, color = "r",
-        linewidth=0, alpha = 1)
-	ax.plot_surface(xx, yy, depth ,rstride=1, cstride=1, cmap=plt.cm.viridis,
-        linewidth=0)
+	ax.plot_surface(xx, yy, z, rstride = 1, cstride = 1, color = "r",
+        linewidth = 0, alpha = 1)
+	ax.plot_surface(xx, yy, depth ,rstride = 1, cstride = 1, cmap = plt.cm.viridis,
+        linewidth = 0)
 	ax.set_zlim(depth.max(), depth.min())
 	ax.view_init(45, 90)
 
@@ -203,5 +202,5 @@ if __name__ == '__main__':
 	eulers = Euler_Angles(n)
 
 	# Plot the results
-	plot_3d(n, constant, depth)
+	plot_3d(n, constant, depth, 0.1)
 
