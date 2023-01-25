@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 # Defining variables:
 
@@ -26,9 +27,9 @@ def impot_data():
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 	#percent by which the image is resized
-	scale_percent = 20
+	scale_percent = 10
 
-	#calculate the 50 percent of original dimensions
+	#calculate the X percent of original dimensions
 	width = int(img.shape[1] * scale_percent / 100)
 	height = int(img.shape[0] * scale_percent / 100)
 
@@ -105,7 +106,39 @@ def Euler_Angles(n):
 
 	return eulers
 
+def set_axes_radius(ax, origin, radius):
+    '''
+        From StackOverflow question:
+        https://stackoverflow.com/questions/13685386/
+    '''
+    ax.set_xlim3d([origin[0] - radius, origin[0] + radius])
+    ax.set_ylim3d([origin[1] - radius, origin[1] + radius])
+    ax.set_zlim3d([origin[2] - radius, origin[2] + radius])
+
+
+def set_axes_equal(ax, zoom=1.):
+    '''
+        Make axes of 3D plot have equal scale so that spheres appear as spheres,
+        cubes as cubes, etc..  This is one possible solution to Matplotlib's
+        ax.set_aspect("equal") and ax.axis("equal") not working for 3D.
+        input:
+          ax:   a matplotlib axis, e.g., as output from plt.gca().
+
+    '''
+
+    limits = np.array([
+        ax.get_xlim3d(),
+        ax.get_ylim3d(),
+        ax.get_zlim3d(),
+    ])
+
+    origin = np.mean(limits, axis=1)
+    radius = 0.5 * np.max(np.abs(limits[:, 1] - limits[:, 0])) / zoom
+    set_axes_radius(ax, origin, radius)
+
 def plot_3d(n, constant, depth):
+
+	step = 20
 	xx, yy = np.mgrid[0:depth.shape[0], 0:depth.shape[1]]
 
 	# calculate Z for the plane equation
@@ -113,14 +146,36 @@ def plot_3d(n, constant, depth):
 
 	fig = plt.figure()
 	ax = fig.gca(projection='3d')
+
+	ax.set_zlabel("Z", color='b', size=18)
+
+	
+	ax.quiver(
+		xx[0:depth.shape[0]:step, 
+		   0:depth.shape[1]:step],
+
+		yy[0:depth.shape[0]:step,
+		   0:depth.shape[1]:step], 
+		
+		z[0:depth.shape[0]:step,
+		  0:depth.shape[1]:step], 
+		
+		n[0], n[1], n[2],
+
+		color="m", length=50)
+	set_axes_equal(ax)
+
+	ax.plot_surface(xx, yy, z, rstride=1, cstride=1, color = "r",
+        linewidth=0, alpha = 1)
 	ax.plot_surface(xx, yy, depth ,rstride=1, cstride=1, cmap=plt.cm.viridis,
         linewidth=0)
 	ax.set_zlim(depth.max(), depth.min())
 	ax.view_init(45, 90)
 
-	ax.plot_surface(xx, yy, z, rstride=1, cstride=1, color = "r",
-        linewidth=0, alpha = 1)
+	
 
+	
+	
 	# show it
 	plt.show()
 
