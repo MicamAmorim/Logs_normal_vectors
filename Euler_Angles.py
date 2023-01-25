@@ -5,44 +5,33 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 # Defining variables:
+#path = = "2_depth.txt", path = "cubo_depth_02.png"
 
+def impot_data(path = "Sensor_data/cubo_depth_02.png"):
+	
+	try:
+		#Import Depth
+		sensor_data = np.genfromtxt(path, delimiter=',') 
+		sensor_data = cv2.rotate(sensor_data, cv2.ROTATE_90_CLOCKWISE)
+	except:
+		#Import RGB
+		sensor_data = cv2.imread(path)
+		sensor_data = cv2.cvtColor(sensor_data, cv2.COLOR_BGR2GRAY)
 
-def impot_data():
-	z_path = "2_depth.txt"
-	RGB_path = "cubo_depth_02.png"
-	intr_path = "2_intrinsics.txt"
+		#percent by which the image is resized
+		scale_percent = 10
 
-	depth = np.genfromtxt(z_path, delimiter=',') 
-	depth = cv2.rotate(depth, cv2.ROTATE_90_CLOCKWISE)
-	print(depth.shape)
-	M,N = depth.shape
+		#calculate the X percent of original dimensions
+		width = int(sensor_data.shape[1] * scale_percent / 100)
+		height = int(sensor_data.shape[0] * scale_percent / 100)
 
-	img = cv2.imread(RGB_path)
+		# dsize
+		dsize = (width, height)
+		
+		# resize image
+		sensor_data = cv2.resize(sensor_data, dsize)
 
-	M_rgb, N_rgb,_ = img.shape
-
-	Sh = M_rgb/M
-	Sw = N_rgb/N
-
-	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-	#percent by which the image is resized
-	scale_percent = 10
-
-	#calculate the X percent of original dimensions
-	width = int(img.shape[1] * scale_percent / 100)
-	height = int(img.shape[0] * scale_percent / 100)
-
-	# dsize
-	dsize = (width, height)
-
-	# resize image
-	img = cv2.resize(img, dsize)
-
-	intrinsics = np.genfromtxt(intr_path, delimiter=',')
-	print(intrinsics)
-
-	return depth, img, [Sh, Sw], intrinsics
+	return sensor_data
 
 def click_event(event, x, y, flags, params): 
 	if len(seed) >= 3:
@@ -189,18 +178,30 @@ def copy8bits(depth):
 
 if __name__ == '__main__':
 
+	# Define the data path
+	path = "Sensor_data/2_depth.txt"
+	# Import data
+	depth = impot_data(path)
 
-	# invert the position of img with depth to import the raw data
-	img, depth, scale, intrinsics = impot_data()
-	#print_import(depth, img)
-	seed = []
+	# When you need to print both depth and RGB data
+	## print_import(depth, img)
 	
+	# Define global list for the 3 coplanar points
+	seed = []
+
+	# Make a copy of the depth to preserve data
 	arr1 = copy8bits(depth)
 
+	# Event to choose point
 	choose_point()
 	print(seed)
+
+	# Calculate the normal vector and the constant parameter
 	n, constant = normal_vector(depth, seed)
+
+	# Convert the normal vector in Euler angles
 	eulers = Euler_Angles(n)
 
+	# Plot the results
 	plot_3d(n, constant, depth)
 
