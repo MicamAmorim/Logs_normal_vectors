@@ -127,6 +127,8 @@ def set_axes_equal(ax, zoom=1.):
 
 def plot_3d(n, constant, depth, arrow_size = 50, step = 20):
 
+	print('plane equation:\n{:1.4f}x + {:1.4f}y + {:1.4f}z + {:1.4f} = 0'.format(n[0], n[1], n[2], constant))
+
 	xx, yy = np.mgrid[0:depth.shape[0], 0:depth.shape[1]]
 
 	# calculate Z for the plane equation
@@ -134,10 +136,7 @@ def plot_3d(n, constant, depth, arrow_size = 50, step = 20):
 
 	fig = plt.figure()
 	ax = fig.gca(projection = '3d')
-
 	ax.set_zlabel("Z", color = 'b', size = 18)
-
-	
 	ax.quiver(
 		xx[0:depth.shape[0]:step, 
 		   0:depth.shape[1]:step],
@@ -148,21 +147,18 @@ def plot_3d(n, constant, depth, arrow_size = 50, step = 20):
 		z[0:depth.shape[0]:step,
 		  0:depth.shape[1]:step], 
 		
-		n[0], n[1], n[2],
+		-n[0], -n[1], -n[2],
 
 		color = "m", length = arrow_size)
-	set_axes_equal(ax)
 
 	ax.plot_surface(xx, yy, z, rstride = 1, cstride = 1, color = "r",
         linewidth = 0, alpha = 1)
 	ax.plot_surface(xx, yy, depth ,rstride = 1, cstride = 1, cmap = plt.cm.viridis,
         linewidth = 0)
+
+	set_axes_equal(ax)
 	ax.set_zlim(depth.max(), depth.min())
 	ax.view_init(45, 90)
-
-	
-
-	
 	
 	# show it
 	plt.show()
